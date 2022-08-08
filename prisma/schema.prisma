@@ -38,6 +38,26 @@ model Account {
     @@unique([provider, providerAccountId])
 }
 
+model Topic {
+    id          String       @id @default(cuid())
+    name        String
+    description String?
+    public      Boolean
+    ownerId     String
+    owner       User         @relation(fields: [ownerId], references: [id])
+    flashcards  Flashcards[]
+}
+
+model Flashcards {
+    id       String  @id @default(cuid())
+    question String
+    answer   String
+    topicId  String?
+    topic    Topic?  @relation(fields: [topicId], references: [id])
+    ownerId  String
+    owner    User    @relation(fields: [ownerId], references: [id])
+}
+
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
@@ -47,13 +67,15 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String       @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?      @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    topics        Topic[]
+    flashcards    Flashcards[]
 }
 
 model VerificationToken {
