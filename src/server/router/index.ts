@@ -10,7 +10,7 @@ export const appRouter = createRouter()
   .transformer(superjson)
   .merge("example.", exampleRouter)
   .merge("question.", protectedExampleRouter)
-  .merge("topic", topicRouter);
+  .merge("topic.", topicRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

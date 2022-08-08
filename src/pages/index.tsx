@@ -3,10 +3,30 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { trpc } from "@/utils/trpc";
 
+const TopicList = () => {
+  const { data: session } = useSession();
+
+  const { data: topics, isLoading } = trpc.useQuery([
+    "topic.getUserTopics",
+    { userId: session!.user!.id! },
+  ]);
+
+  return (
+    <>
+      <h2>{session?.user?.name} Topics</h2>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        topics?.map((topic) => <div key={topic.id}>{topic.name}</div>)
+      )}
+    </>
+  );
+};
+
 const TopicForm = () => {
   const { data: session } = useSession();
 
-  const createMutation = trpc.useMutation(["topiccreate"]);
+  const createMutation = trpc.useMutation(["topic.create"]);
 
   const initState = {
     name: "",
@@ -71,6 +91,7 @@ const TopicForm = () => {
         <input type="submit" value="Submit" />
       </form>
       {createMutation.isSuccess && <div>TOPIC CREATED</div>}
+      <hr />
     </>
   );
 };
@@ -90,6 +111,7 @@ const Home: NextPage = () => {
       )}
 
       {session && session.user ? <TopicForm /> : null}
+      {session && session.user ? <TopicList /> : null}
     </>
   );
 };
