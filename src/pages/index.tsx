@@ -17,8 +17,14 @@ const TopicList = () => {
       {isLoading ? (
         <div>Loading...</div>
       ) : (
-        topics?.map((topic) => <div key={topic.id}>{topic.name}</div>)
+        <>
+          <div>Uncategorized</div>
+          {topics?.map((topic) => (
+            <div key={topic.id}>{topic.name}</div>
+          ))}
+        </>
       )}
+      <hr className="py-2" />
     </>
   );
 };
@@ -66,6 +72,7 @@ const TopicForm = () => {
         <input
           type={"text"}
           name="name"
+          id="name"
           value={topic.name}
           onChange={handleTextChange}
         />
@@ -91,7 +98,80 @@ const TopicForm = () => {
         <input type="submit" value="Submit" />
       </form>
       {createMutation.isSuccess && <div>TOPIC CREATED</div>}
-      <hr />
+      <hr className="py-2" />
+    </>
+  );
+};
+
+const FlashcardForm = () => {
+  const { data: session } = useSession();
+  const { data: userTopics } = trpc.useQuery([
+    "topic.getUserTopics",
+    { userId: session!.user!.id! },
+  ]);
+  const initFormData = { question: "", answer: "", topicId: undefined };
+  const [formData, setFormData] = useState<{
+    question: string;
+    answer: string;
+    topicId?: string;
+  }>(initFormData);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    return setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    console.log({ ...formData, ownerId: session!.user!.id });
+    setFormData(initFormData);
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="topic">Topic</label>
+        <select
+          name="topicId"
+          id="topic"
+          value={formData.topicId}
+          onChange={handleChange}
+        >
+          <option value={undefined}>Uncategorized</option>
+          {userTopics &&
+            userTopics.map((topic) => (
+              <option value={topic.id} key={topic.id}>
+                {topic.name}
+              </option>
+            ))}
+        </select>
+
+        <label htmlFor="question">Question:</label>
+        <input
+          type="text"
+          name="question"
+          id="question"
+          value={formData.question}
+          onChange={handleChange}
+        />
+
+        <label htmlFor="answer">Answer:</label>
+        <input
+          type="text"
+          name="answer"
+          id="answer"
+          value={formData.answer}
+          onChange={handleChange}
+        />
+
+        <br />
+        <input type="submit" value="Submit" />
+      </form>
     </>
   );
 };
@@ -109,9 +189,10 @@ const Home: NextPage = () => {
       ) : (
         <button onClick={() => signIn()}>Sign In</button>
       )}
-
+      <hr className="py-2" />
       {session && session.user ? <TopicForm /> : null}
       {session && session.user ? <TopicList /> : null}
+      {session && session.user ? <FlashcardForm /> : null}
     </>
   );
 };
