@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { trpc } from "@/utils/trpc";
+import { trpc, inferMutationInput } from "@/utils/trpc";
 
 const TopicList = () => {
   const { data: session } = useSession();
@@ -116,6 +116,9 @@ const FlashcardForm = () => {
     topicId?: string;
   }>(initFormData);
 
+  type createFlashcard = inferMutationInput<"flashcard.create">;
+  const flashcardCreateMutation = trpc.useMutation(["flashcard.create"]);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -125,10 +128,16 @@ const FlashcardForm = () => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    console.log({ ...formData, ownerId: session!.user!.id });
+    const newCard: createFlashcard = {
+      ...formData,
+      ownerId: session!.user!.id!,
+    };
+
+    console.log(newCard);
+    await flashcardCreateMutation.mutateAsync(newCard);
     setFormData(initFormData);
   };
 
