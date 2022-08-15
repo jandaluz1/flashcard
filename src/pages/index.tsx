@@ -185,6 +185,36 @@ const FlashcardForm = () => {
   );
 };
 
+const UserCardList = () => {
+  const { data: session } = useSession();
+  const { data: cards } = trpc.useQuery([
+    "flashcard.getUserCards",
+    { id: session!.user!.id! },
+  ]);
+
+  return (
+    <>
+      <h2>USER CARDS</h2>
+      {cards?.map((card) => (
+        <div key={card.id}>{card.question}</div>
+      ))}
+    </>
+  );
+};
+
+const PublicTopics = () => {
+  const { data: topics } = trpc.useQuery(["public.getPublicTopics"]);
+
+  return (
+    <>
+      <h2>Public Topics</h2>
+      {topics?.map((topic) => (
+        <div key={topic.id}>{topic.name}</div>
+      ))}
+    </>
+  );
+};
+
 const Home: NextPage = () => {
   const { data: session } = useSession();
 
@@ -202,6 +232,8 @@ const Home: NextPage = () => {
       {session && session.user ? <TopicForm /> : null}
       {session && session.user ? <TopicList /> : null}
       {session && session.user ? <FlashcardForm /> : null}
+      {session && session.user ? <UserCardList /> : null}
+      <PublicTopics />
     </>
   );
 };
