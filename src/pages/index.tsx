@@ -160,23 +160,6 @@ const FlashcardForm = () => {
   );
 };
 
-const UserCardList = () => {
-  const { data: session } = useSession();
-  const { data: cards } = trpc.useQuery([
-    "flashcard.getUserCards",
-    { id: session!.user!.id! },
-  ]);
-
-  return (
-    <>
-      <h2>USER CARDS</h2>
-      {cards?.map((card) => (
-        <div key={card.id}>{card.question}</div>
-      ))}
-    </>
-  );
-};
-
 const PublicTopics = () => {
   const { data: topics } = trpc.useQuery(["public.getPublicTopics"]);
 
@@ -207,12 +190,11 @@ const Home: NextPage = () => {
           <button onClick={() => signOut()}>Sign Out</button>
         </div>
       ) : (
-        <button onClick={handleSignIn}>Sign In</button>
+        <button onClick={() => signIn()}>Sign In</button>
       )}
       <hr className="py-2" />
       {session && session.user ? <TopicForm /> : null}
       {session && session.user ? <FlashcardForm /> : null}
-      {session && session.user ? <UserCardList /> : null}
       <PublicTopics />
     </>
   );
