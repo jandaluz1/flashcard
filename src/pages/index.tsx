@@ -4,32 +4,6 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { trpc, inferMutationInput } from "@/utils/trpc";
 import { useRouter } from "next/router";
 
-const TopicList = () => {
-  const { data: session } = useSession();
-
-  const { data: topics, isLoading } = trpc.useQuery([
-    "topic.getUserTopics",
-    { userId: session!.user!.id! },
-  ]);
-
-  return (
-    <>
-      <h2>{session?.user?.name} Topics</h2>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <div>Uncategorized</div>
-          {topics?.map((topic) => (
-            <div key={topic.id}>{topic.name}</div>
-          ))}
-        </>
-      )}
-      <hr className="py-2" />
-    </>
-  );
-};
-
 const TopicForm = () => {
   const { data: session } = useSession();
 
@@ -237,7 +211,6 @@ const Home: NextPage = () => {
       )}
       <hr className="py-2" />
       {session && session.user ? <TopicForm /> : null}
-      {session && session.user ? <TopicList /> : null}
       {session && session.user ? <FlashcardForm /> : null}
       {session && session.user ? <UserCardList /> : null}
       <PublicTopics />
