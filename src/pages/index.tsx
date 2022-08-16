@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { trpc, inferMutationInput } from "@/utils/trpc";
+import { useRouter } from "next/router";
 
 const TopicList = () => {
   const { data: session } = useSession();
@@ -217,6 +218,12 @@ const PublicTopics = () => {
 
 const Home: NextPage = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleSignIn = async () => {
+    await signIn();
+    router.push("/dashboard");
+  };
 
   return (
     <>
@@ -226,7 +233,7 @@ const Home: NextPage = () => {
           <button onClick={() => signOut()}>Sign Out</button>
         </div>
       ) : (
-        <button onClick={() => signIn()}>Sign In</button>
+        <button onClick={handleSignIn}>Sign In</button>
       )}
       <hr className="py-2" />
       {session && session.user ? <TopicForm /> : null}
