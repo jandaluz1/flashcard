@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut, getSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 
 const UserTopicList = () => {
@@ -70,5 +70,22 @@ const Dashboard: NextPage = () => {
     </>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+}
 
 export default Dashboard;
