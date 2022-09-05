@@ -190,7 +190,15 @@ const Home: NextPage = () => {
           <button onClick={() => signOut()}>Sign Out</button>
         </div>
       ) : (
-        <button onClick={() => signIn()}>Sign In</button>
+        <button
+          onClick={() =>
+            signIn("gmail github", {
+              callbackUrl: `${window.location.origin}/dashboard`,
+            })
+          }
+        >
+          Sign In
+        </button>
       )}
       <hr className="py-2" />
       {session && session.user ? <TopicForm /> : null}

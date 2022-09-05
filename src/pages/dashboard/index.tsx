@@ -50,9 +50,6 @@ const Dashboard: NextPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    status === "unauthenticated" ? router.push("/") : router.push("/dashboard");
-  }, []);
   return (
     <>
       {status === "loading" ? (
