@@ -1,6 +1,4 @@
 import type { NextPage } from "next";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { useSession, signOut, getSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 
@@ -14,7 +12,6 @@ const UserTopicList = () => {
 
   return (
     <>
-      <h2>{session?.user?.name} Topics</h2>
       {isLoading ? (
         <div>Loading...</div>
       ) : (
@@ -48,7 +45,6 @@ const UserCardList = () => {
 
 const Dashboard: NextPage = () => {
   const { data: session, status } = useSession();
-  const router = useRouter();
 
   return (
     <>
@@ -57,8 +53,9 @@ const Dashboard: NextPage = () => {
       ) : (
         <>
           <h1>{session?.user?.name}&apos;s Dashboard</h1>
+          <button onClick={() => signOut()}>Sign Out</button>
           <hr />
-          <h2>Topics</h2>
+          <h2>My Topics</h2>
           <UserTopicList />
           <h2>Flashcards</h2>
           <UserCardList />
