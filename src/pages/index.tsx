@@ -1,8 +1,7 @@
 import type { NextPage } from "next";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, getSession } from "next-auth/react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { trpc, inferMutationInput } from "@/utils/trpc";
-import { useRouter } from "next/router";
 
 const TopicForm = () => {
   const { data: session } = useSession();
@@ -174,38 +173,36 @@ const PublicTopics = () => {
 };
 
 const Home: NextPage = () => {
-  const { data: session } = useSession();
-  const router = useRouter();
-
-  const handleSignIn = async () => {
-    await signIn();
-    router.push("/dashboard");
-  };
-
   return (
     <>
-      {session ? (
-        <div>
-          Logged in as: {session.user?.name}{" "}
-          <button onClick={() => signOut()}>Sign Out</button>
-        </div>
-      ) : (
-        <button
-          onClick={() =>
-            signIn("gmail github", {
-              callbackUrl: `${window.location.origin}/dashboard`,
-            })
-          }
-        >
-          Sign In
-        </button>
-      )}
-      <hr className="py-2" />
-      {session && session.user ? <TopicForm /> : null}
-      {session && session.user ? <FlashcardForm /> : null}
-      <PublicTopics />
+      <button
+        onClick={() =>
+          signIn("gmail github", {
+            callbackUrl: `${window.location.origin}/dashboard`,
+          })
+        }
+      >
+        Sign In
+      </button>
     </>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const session = await getSession(context);
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
+}
 
 export default Home;
